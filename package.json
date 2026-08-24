@@ -1,0 +1,34 @@
+{
+  "name": "lead-finder",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/cli.js",
+  "type": "module",
+  "scripts": {
+    "scrape:gmaps": "tsx src/cli.ts gmaps",
+    "scrape:search": "tsx src/cli.ts search",
+    "scrape:ig": "tsx src/cli.ts ig",
+    "test:ai": "tsx src/test-ai.ts",
+    "dashboard": "tsx src/server.ts",
+    "build": "tsc",
+    "start": "node dist/cli.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.15.0",
+  "dependencies": {
+    "@hono/node-server": "^2.1.1",
+    "commander": "^15.0.0",
+    "crawlee": "^3.18.1",
+    "dotenv": "^17.4.2",
+    "hono": "^4.13.3",
+    "playwright": "^1.62.1",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^26.2.0",
+    "tsx": "^4.23.12",
+    "typescript": "^7.0.2"
+  }
+}

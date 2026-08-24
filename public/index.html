@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🎯 Lead Finder Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    /* Hide scrollbar for clean horizontal scroll on mobile */
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen antialiased flex flex-col justify-between">
+  
+  <div>
+    <!-- Top Navigation -->
+    <header class="border-b border-slate-800 bg-slate-900/90 backdrop-blur sticky top-0 z-30">
+      <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2">
+        <div class="flex items-center gap-2.5 min-w-0">
+          <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center text-slate-950 font-black text-lg sm:text-xl shadow-lg shadow-emerald-500/20 shrink-0">
+            🎯
+          </div>
+          <div class="min-w-0">
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <h1 class="font-bold text-base sm:text-lg text-white leading-tight truncate">Lead Finder</h1>
+              <span class="text-[10px] sm:text-xs px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-medium">DeepSeek AI</span>
+            </div>
+            <p class="text-[11px] text-slate-400 hidden sm:block">Local Business Lead Discovery & WhatsApp Outreach</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 shrink-0">
+          <button id="btnNewScrapeModal" class="px-3 sm:px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs sm:text-sm transition flex items-center gap-1.5 shadow-lg shadow-emerald-500/20 active:scale-95">
+            <span class="text-base leading-none">+</span>
+            <span class="hidden xs:inline">Cari Lead</span>
+            <span class="inline xs:hidden">Cari</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-5 sm:py-8 space-y-5 sm:space-y-6">
+      
+      <!-- Stats Cards -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
+        <div class="bg-slate-900/80 border border-slate-800 p-3.5 sm:p-5 rounded-2xl">
+          <div class="text-slate-400 text-[10px] sm:text-xs font-semibold uppercase tracking-wider">Total Leads</div>
+          <div id="statTotal" class="text-2xl sm:text-3xl font-extrabold text-white mt-1">0</div>
+          <div class="text-[10px] sm:text-xs text-slate-500 mt-0.5 truncate">Data terkumpul</div>
+        </div>
+        <div class="bg-slate-900/80 border border-slate-800 p-3.5 sm:p-5 rounded-2xl">
+          <div class="text-amber-400/90 text-[10px] sm:text-xs font-semibold uppercase tracking-wider truncate">Tanpa Website</div>
+          <div id="statNoWeb" class="text-2xl sm:text-3xl font-extrabold text-amber-400 mt-1">0</div>
+          <div class="text-[10px] sm:text-xs text-amber-500/70 mt-0.5 truncate">Peluang website/katalog</div>
+        </div>
+        <div class="bg-slate-900/80 border border-slate-800 p-3.5 sm:p-5 rounded-2xl">
+          <div class="text-emerald-400/90 text-[10px] sm:text-xs font-semibold uppercase tracking-wider truncate">WhatsApp Aktif</div>
+          <div id="statHasWa" class="text-2xl sm:text-3xl font-extrabold text-emerald-400 mt-1">0</div>
+          <div class="text-[10px] sm:text-xs text-emerald-500/70 mt-0.5 truncate">Siap dihubungi</div>
+        </div>
+        <div class="bg-slate-900/80 border border-slate-800 p-3.5 sm:p-5 rounded-2xl">
+          <div class="text-rose-400/90 text-[10px] sm:text-xs font-semibold uppercase tracking-wider truncate">Hot (Score > 80)</div>
+          <div id="statHotLeads" class="text-2xl sm:text-3xl font-extrabold text-rose-400 mt-1">0</div>
+          <div class="text-[10px] sm:text-xs text-rose-400/70 mt-0.5 truncate">Prioritas utama</div>
+        </div>
+      </div>
+
+      <!-- CLI Quick Guide Card -->
+      <div class="bg-slate-900/80 border border-slate-800 p-3.5 sm:p-4 rounded-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-3 sm:gap-4">
+        <div class="space-y-1 min-w-0 w-full md:w-auto">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="text-[10px] sm:text-xs px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-bold border border-emerald-500/30">💡 Cara 2: Terminal CLI</span>
+            <span class="text-xs sm:text-sm font-bold text-white">Scraping Cepat via Terminal</span>
+          </div>
+          <p class="text-[11px] sm:text-xs text-slate-400">
+            Jalankan perintah ini di terminal. Hasilnya otomatis masuk ke dropdown di bawah.
+          </p>
+        </div>
+
+        <div class="flex items-center justify-between gap-2 bg-slate-950 border border-slate-800 rounded-xl p-1.5 sm:p-2 w-full md:w-auto font-mono text-[11px] sm:text-xs text-slate-300">
+          <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pl-1">
+            <span class="text-emerald-400 select-none">$</span>
+            <code id="cliCommandText" class="whitespace-nowrap">pnpm scrape:gmaps -k "katering" -l "Mataram" -m 15</code>
+          </div>
+          <button id="btnCopyCli" class="shrink-0 px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-200 font-sans font-semibold text-[11px] sm:text-xs transition border border-slate-700">
+            Salin
+          </button>
+        </div>
+      </div>
+
+      <!-- Filters & Actions -->
+      <div class="bg-slate-900/90 border border-slate-800 p-3.5 sm:p-4 rounded-2xl space-y-3">
+        <!-- Search & Select Row -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
+          <div>
+            <label class="block text-[11px] text-slate-400 font-medium mb-1">File Hasil Scraping:</label>
+            <select id="fileSelect" class="w-full bg-slate-950 border border-slate-800 text-slate-200 text-xs sm:text-sm rounded-xl px-3 py-2.5 focus:outline-none focus:border-emerald-500">
+              <option value="">Pilih Hasil Scraping...</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-[11px] text-slate-400 font-medium mb-1">Pencarian Cepat:</label>
+            <input id="searchInput" type="text" placeholder="Cari nama bisnis / kategori..." class="w-full bg-slate-950 border border-slate-800 text-slate-200 text-xs sm:text-sm rounded-xl px-3 py-2.5 focus:outline-none focus:border-emerald-500 placeholder:text-slate-600">
+          </div>
+        </div>
+
+        <!-- Filter Buttons Row -->
+        <div class="flex items-center justify-between gap-2 pt-1 flex-wrap">
+          <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1 max-w-full">
+            <button data-filter="all" class="filter-btn active px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500 text-slate-950 transition shrink-0">Semua</button>
+            <button data-filter="noweb" class="filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 transition shrink-0">❌ Tanpa Web</button>
+            <button data-filter="haswa" class="filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 transition shrink-0">💬 Ada WhatsApp</button>
+            <button data-filter="hot" class="filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 transition shrink-0">🔥 Score > 80</button>
+          </div>
+          
+          <button id="btnQualifyAll" class="w-full sm:w-auto px-3.5 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white transition flex items-center justify-center gap-1.5 shrink-0 shadow-lg shadow-indigo-600/20 active:scale-95">
+            <span>✨</span> AI Qualify Semua
+          </button>
+        </div>
+      </div>
+
+      <!-- DESKTOP VIEW: Table -->
+      <div class="hidden md:block bg-slate-900/80 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm text-slate-300">
+            <thead class="text-xs uppercase bg-slate-950/60 text-slate-400 border-b border-slate-800">
+              <tr>
+                <th class="px-5 py-3.5 font-semibold">Bisnis</th>
+                <th class="px-4 py-3.5 font-semibold">Reputasi & Review</th>
+                <th class="px-4 py-3.5 font-semibold">Website</th>
+                <th class="px-4 py-3.5 font-semibold">Kontak</th>
+                <th class="px-4 py-3.5 font-semibold">AI Score</th>
+                <th class="px-5 py-3.5 font-semibold text-right">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="leadsTableBody" class="divide-y divide-slate-800/80">
+              <tr>
+                <td colspan="6" class="text-center py-12 text-slate-500">
+                  Memuat data leads...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- MOBILE / TABLET VIEW: Responsive Cards -->
+      <div id="leadsCardContainer" class="block md:hidden space-y-3">
+        <div class="text-center py-8 text-slate-500 text-xs">
+          Memuat data leads...
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <footer class="border-t border-slate-900 py-4 text-center text-xs text-slate-600">
+    Lead Finder AI • Auto Discovery & WhatsApp Outreach
+  </footer>
+
+  <!-- Outreach Modal (Fully Responsive) -->
+  <div id="outreachModal" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-sm hidden items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-4 sm:p-6 space-y-4 shadow-2xl my-auto max-h-[90vh] flex flex-col justify-between">
+      
+      <div class="flex items-start justify-between border-b border-slate-800 pb-3 gap-2">
+        <div class="min-w-0">
+          <h3 id="modalBizName" class="font-bold text-base sm:text-lg text-white truncate">Nama Bisnis</h3>
+          <p id="modalBizSub" class="text-xs text-slate-400 truncate">Pesan Pendekatan Personal</p>
+        </div>
+        <button id="btnCloseModal" class="text-slate-400 hover:text-white text-xl p-1 shrink-0 leading-none">✕</button>
+      </div>
+
+      <div class="overflow-y-auto space-y-3 pr-1">
+        <!-- AI Insights -->
+        <div id="modalAiBox" class="bg-indigo-950/40 border border-indigo-500/30 rounded-xl p-3 sm:p-3.5 space-y-2">
+          <div class="flex items-center justify-between text-xs font-semibold">
+            <span class="text-indigo-300 flex items-center gap-1">💡 DeepSeek AI Analysis</span>
+            <span id="modalAiScore" class="px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-bold">Score: -</span>
+          </div>
+          <div id="modalAiReasons" class="text-xs text-slate-300 space-y-1"></div>
+          <div id="modalAiService" class="text-xs text-emerald-400 font-medium"></div>
+        </div>
+
+        <!-- Message Editor -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1">Pesan WhatsApp (Bisa diedit langsung):</label>
+          <textarea id="modalMsgText" rows="5" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-emerald-500"></textarea>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-800/80">
+        <button id="btnCopyMsg" class="flex-1 sm:flex-none px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs sm:text-sm font-semibold transition">
+          📋 Salin
+        </button>
+        <a id="btnSendWa" target="_blank" class="flex-1 sm:flex-none px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs sm:text-sm font-bold transition flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-500/20 text-center">
+          <span>💬</span> Chat di WA
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scrape Modal (Fully Responsive) -->
+  <div id="scrapeModal" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-sm hidden items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-4 sm:p-6 space-y-4 shadow-2xl my-auto">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="font-bold text-base sm:text-lg text-white">🚀 Jalankan Scraping Baru</h3>
+        <button id="btnCloseScrapeModal" class="text-slate-400 hover:text-white text-xl p-1 leading-none">✕</button>
+      </div>
+      
+      <form id="scrapeForm" class="space-y-3.5">
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1">Sumber Data</label>
+          <div class="bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs sm:text-sm text-emerald-400 font-semibold flex items-center gap-2">
+            <span>📍</span> Google Maps (Data Terlengkap & Valid)
+          </div>
+          <input type="hidden" id="scrapeSource" value="gmaps">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1">Keyword Bisnis</label>
+          <input id="scrapeKeyword" type="text" placeholder="cth: bakery, katering, barbershop" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs sm:text-sm text-slate-200 focus:border-emerald-500">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1">Kota / Lokasi</label>
+          <input id="scrapeLocation" type="text" placeholder="cth: Mataram, Denpasar, Surabaya" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs sm:text-sm text-slate-200 focus:border-emerald-500">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1">Maksimal Lead</label>
+          <input id="scrapeMax" type="number" value="15" min="1" max="50" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs sm:text-sm text-slate-200 focus:border-emerald-500">
+        </div>
+
+        <button type="submit" id="btnSubmitScrape" class="w-full py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs sm:text-sm transition shadow-lg shadow-emerald-500/20 active:scale-98">
+          Mulai Cari Leads
+        </button>
+
+        <div class="pt-2 border-t border-slate-800 text-center">
+          <p class="text-[11px] text-slate-400">Atau jalankan via Terminal:</p>
+          <code class="inline-block mt-1 px-2.5 py-1 rounded bg-slate-950 text-[10px] text-emerald-400 font-mono border border-slate-800 break-all">
+            pnpm scrape:gmaps -k "&lt;keyword&gt;" -l "&lt;kota&gt;" -m 20
+          </code>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    let currentLeads = [];
+    let currentFilter = 'all';
+    let selectedLead = null;
+
+    async function loadFiles() {
+      try {
+        const res = await fetch('/api/files');
+        const files = await res.json();
+        const select = document.getElementById('fileSelect');
+        select.innerHTML = '<option value="">Pilih Hasil Scraping...</option>';
+        files.forEach((f, idx) => {
+          const opt = document.createElement('option');
+          opt.value = f;
+          opt.textContent = f;
+          if (idx === 0) opt.selected = true;
+          select.appendChild(opt);
+        });
+
+        if (files.length > 0) {
+          loadLeads(files[0]);
+        } else {
+          renderData([]);
+        }
+      } catch (err) {
+        console.error('Failed to load files', err);
+      }
+    }
+
+    async function loadLeads(filename) {
+      if (!filename) return;
+      try {
+        const res = await fetch(`/api/leads?file=${encodeURIComponent(filename)}`);
+        currentLeads = await res.json();
+        updateStats();
+        applyFilters();
+      } catch (err) {
+        console.error('Failed to load leads', err);
+      }
+    }
+
+    function updateStats() {
+      document.getElementById('statTotal').textContent = currentLeads.length;
+      document.getElementById('statNoWeb').textContent = currentLeads.filter(l => !l.hasWebsite).length;
+      document.getElementById('statHasWa').textContent = currentLeads.filter(l => l.hasWhatsApp).length;
+      document.getElementById('statHotLeads').textContent = currentLeads.filter(l => (l.qualification?.score || 0) >= 80).length;
+    }
+
+    function applyFilters() {
+      const query = document.getElementById('searchInput').value.toLowerCase();
+      
+      const filtered = currentLeads.filter(lead => {
+        const matchQuery = (lead.name || '').toLowerCase().includes(query) || (lead.category || '').toLowerCase().includes(query) || (lead.address || '').toLowerCase().includes(query);
+        if (!matchQuery) return false;
+
+        if (currentFilter === 'noweb') return !lead.hasWebsite;
+        if (currentFilter === 'haswa') return lead.hasWhatsApp;
+        if (currentFilter === 'hot') return (lead.qualification?.score || 0) >= 80;
+        return true;
+      });
+
+      renderData(filtered);
+    }
+
+    function renderData(leads) {
+      renderTable(leads);
+      renderCards(leads);
+    }
+
+    // Desktop Table Render
+    function renderTable(leads) {
+      const tbody = document.getElementById('leadsTableBody');
+      if (leads.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-12 text-slate-500">Tidak ada lead ditemukan</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = leads.map((l) => {
+        const score = l.qualification?.score ?? '-';
+        const scoreBadgeColor = score >= 80 ? 'bg-rose-500/20 text-rose-400 border-rose-500/30' : score >= 60 ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' : 'bg-slate-700/50 text-slate-400 border-slate-600';
+        
+        return `
+          <tr class="hover:bg-slate-800/40 transition">
+            <td class="px-5 py-4">
+              <div class="font-bold text-white">${l.name}</div>
+              <div class="text-xs text-slate-400 truncate max-w-[200px]">${l.category || '-'} • ${l.address || '-'}</div>
+            </td>
+            <td class="px-4 py-4 whitespace-nowrap">
+              <div class="flex items-center gap-1.5 font-semibold text-slate-200">
+                <span class="text-amber-400">★</span> ${l.rating || '-'}
+                <span class="text-xs text-slate-400 font-normal">(${l.reviewCount || 0} ulasan)</span>
+              </div>
+            </td>
+            <td class="px-4 py-4 whitespace-nowrap">
+              ${l.hasWebsite 
+                ? `<a href="${l.website}" target="_blank" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">🌐 Ada Web</a>`
+                : `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/30">❌ Belum Ada</span>`
+              }
+            </td>
+            <td class="px-4 py-4 whitespace-nowrap">
+              <div class="font-mono text-xs text-slate-200">${l.phone || '-'}</div>
+              ${l.hasWhatsApp 
+                ? `<span class="text-xs text-emerald-400 flex items-center gap-1">● WA Aktif</span>`
+                : `<span class="text-xs text-slate-500">Telp Kantor</span>`
+              }
+            </td>
+            <td class="px-4 py-4">
+              <div class="flex items-center gap-2">
+                <span class="px-2.5 py-1 rounded-lg text-xs font-bold border ${scoreBadgeColor}">${score}</span>
+                ${l.qualification?.suggestedService ? `<span class="text-xs text-slate-400 truncate max-w-[140px]" title="${l.qualification.suggestedService}">${l.qualification.suggestedService}</span>` : ''}
+              </div>
+            </td>
+            <td class="px-5 py-4 text-right whitespace-nowrap">
+              <button onclick="openOutreachModal('${l.id}')" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-emerald-500 hover:text-slate-950 text-slate-200 text-xs font-semibold transition border border-slate-700 flex items-center gap-1.5 ml-auto active:scale-95">
+                <span>💬</span> Outreach
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // Mobile Cards Render
+    function renderCards(leads) {
+      const container = document.getElementById('leadsCardContainer');
+      if (leads.length === 0) {
+        container.innerHTML = `<div class="text-center py-8 text-slate-500 text-xs bg-slate-900/60 rounded-2xl border border-slate-800">Tidak ada lead ditemukan</div>`;
+        return;
+      }
+
+      container.innerHTML = leads.map((l) => {
+        const score = l.qualification?.score ?? '-';
+        const scoreBadgeColor = score >= 80 ? 'bg-rose-500/20 text-rose-400 border-rose-500/30' : score >= 60 ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' : 'bg-slate-700/50 text-slate-400 border-slate-600';
+
+        return `
+          <div class="bg-slate-900/90 border border-slate-800 p-4 rounded-2xl space-y-3 shadow-lg">
+            <div class="flex items-start justify-between gap-2">
+              <div>
+                <h3 class="font-bold text-white text-sm leading-snug">${l.name}</h3>
+                <p class="text-[11px] text-slate-400 mt-0.5">${l.category || '-'} • ${l.address || '-'}</p>
+              </div>
+              <span class="px-2 py-0.5 rounded-lg text-xs font-bold border ${scoreBadgeColor} shrink-0">${score}</span>
+            </div>
+
+            <div class="flex items-center justify-between text-xs pt-1 border-t border-slate-800/60">
+              <div class="flex items-center gap-1 text-slate-300 font-semibold">
+                <span class="text-amber-400">★</span> ${l.rating || '-'}
+                <span class="text-[11px] text-slate-500 font-normal">(${l.reviewCount || 0} ulasan)</span>
+              </div>
+              <div>
+                ${l.hasWebsite 
+                  ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">🌐 Ada Web</span>`
+                  : `<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/30">❌ Belum Ada Web</span>`
+                }
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between gap-2 pt-2 border-t border-slate-800/80">
+              <div class="text-xs">
+                <div class="font-mono text-slate-300">${l.phone || '-'}</div>
+                ${l.hasWhatsApp ? `<span class="text-[10px] text-emerald-400 font-medium">● WhatsApp Terdeteksi</span>` : `<span class="text-[10px] text-slate-500">Telp Kantor</span>`}
+              </div>
+              <button onclick="openOutreachModal('${l.id}')" class="px-3 py-1.5 rounded-xl bg-emerald-500 text-slate-950 text-xs font-bold transition flex items-center gap-1 shadow-md shadow-emerald-500/10 active:scale-95">
+                <span>💬</span> Outreach
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function openOutreachModal(leadId) {
+      selectedLead = currentLeads.find(l => l.id === leadId);
+      if (!selectedLead) return;
+
+      document.getElementById('modalBizName').textContent = selectedLead.name;
+      document.getElementById('modalBizSub').textContent = `${selectedLead.category || ''} • ${selectedLead.address || ''}`;
+
+      const ai = selectedLead.qualification;
+      document.getElementById('modalAiScore').textContent = `Score: ${ai?.score ?? '-'}`;
+      
+      const reasonsBox = document.getElementById('modalAiReasons');
+      if (ai?.reasons && ai.reasons.length > 0) {
+        reasonsBox.innerHTML = ai.reasons.map(r => `<div>• ${r}</div>`).join('');
+      } else {
+        reasonsBox.innerHTML = '<div>• Belum dianalisis oleh DeepSeek AI</div>';
+      }
+
+      document.getElementById('modalAiService').textContent = ai?.suggestedService ? `🎯 Saran Solusi: ${ai.suggestedService}` : '';
+
+      const defaultMsg = ai?.outreachMessage || `Halo kak ${selectedLead.name}, saya melihat usaha kakak di Google Maps review-nya sangat ramai. Saya perhatikan belum ada website/katalog online resminya ya? Saya bikinkan prototype katalog instan yang terhubung langsung ke WhatsApp agar customer bisa pilih produk lebih rapi. Boleh saya kirimkan link demonya?`;
+      document.getElementById('modalMsgText').value = defaultMsg;
+
+      updateWaLink();
+      document.getElementById('outreachModal').classList.remove('hidden');
+      document.getElementById('outreachModal').classList.add('flex');
+    }
+
+    function updateWaLink() {
+      if (!selectedLead || !selectedLead.whatsappPhone) {
+        document.getElementById('btnSendWa').removeAttribute('href');
+        document.getElementById('btnSendWa').classList.add('opacity-50', 'pointer-events-none');
+        return;
+      }
+      const msg = document.getElementById('modalMsgText').value;
+      const url = `https://wa.me/${selectedLead.whatsappPhone}?text=${encodeURIComponent(msg)}`;
+      const btn = document.getElementById('btnSendWa');
+      btn.href = url;
+      btn.classList.remove('opacity-50', 'pointer-events-none');
+    }
+
+    document.getElementById('modalMsgText').addEventListener('input', updateWaLink);
+
+    document.getElementById('btnCloseModal').addEventListener('click', () => {
+      document.getElementById('outreachModal').classList.add('hidden');
+      document.getElementById('outreachModal').classList.remove('flex');
+    });
+
+    document.getElementById('btnCopyMsg').addEventListener('click', () => {
+      const msg = document.getElementById('modalMsgText').value;
+      navigator.clipboard.writeText(msg);
+      alert('Pesan berhasil disalin!');
+    });
+
+    document.getElementById('btnCopyCli').addEventListener('click', () => {
+      const cmd = document.getElementById('cliCommandText').innerText;
+      navigator.clipboard.writeText(cmd);
+      const btn = document.getElementById('btnCopyCli');
+      btn.textContent = '✓ Tersalin!';
+      setTimeout(() => { btn.textContent = 'Salin'; }, 2000);
+    });
+
+    // File Selection Change
+    document.getElementById('fileSelect').addEventListener('change', (e) => {
+      loadLeads(e.target.value);
+    });
+
+    // Search Input
+    document.getElementById('searchInput').addEventListener('input', applyFilters);
+
+    // Filter Buttons
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => {
+          b.classList.remove('bg-emerald-500', 'text-slate-950');
+          b.classList.add('bg-slate-800', 'text-slate-300');
+        });
+        btn.classList.add('bg-emerald-500', 'text-slate-950');
+        btn.classList.remove('bg-slate-800', 'text-slate-300');
+        currentFilter = btn.dataset.filter;
+        applyFilters();
+      });
+    });
+
+    // Qualify All with DeepSeek
+    document.getElementById('btnQualifyAll').addEventListener('click', async () => {
+      const file = document.getElementById('fileSelect').value;
+      if (!file) return alert('Pilih file leads terlebih dahulu!');
+      
+      const btn = document.getElementById('btnQualifyAll');
+      btn.textContent = '⏳ DeepSeek AI...';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch('/api/qualify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ filename: file }),
+        });
+        const updated = await res.json();
+        currentLeads = updated;
+        updateStats();
+        applyFilters();
+        alert('Semua leads berhasil dikualifikasi dengan DeepSeek AI!');
+      } catch (err) {
+        alert('Gagal mengkualifikasi leads: ' + err.message);
+      } finally {
+        btn.textContent = '✨ AI Qualify Semua';
+        btn.disabled = false;
+      }
+    });
+
+    // Scrape Modal
+    document.getElementById('btnNewScrapeModal').addEventListener('click', () => {
+      document.getElementById('scrapeModal').classList.remove('hidden');
+      document.getElementById('scrapeModal').classList.add('flex');
+    });
+
+    document.getElementById('btnCloseScrapeModal').addEventListener('click', () => {
+      document.getElementById('scrapeModal').classList.add('hidden');
+      document.getElementById('scrapeModal').classList.remove('flex');
+    });
+
+    document.getElementById('scrapeForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('btnSubmitScrape');
+      let seconds = 0;
+      btn.textContent = '⏳ Memulai scraper... (0s)';
+      btn.disabled = true;
+
+      const timer = setInterval(() => {
+        seconds++;
+        btn.textContent = `⏳ Scraping & DeepSeek AI (${seconds}s)...`;
+      }, 1000);
+
+      try {
+        const res = await fetch('/api/scrape', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            source: document.getElementById('scrapeSource').value,
+            keyword: document.getElementById('scrapeKeyword').value,
+            location: document.getElementById('scrapeLocation').value,
+            max: parseInt(document.getElementById('scrapeMax').value, 10),
+          }),
+        });
+
+        clearInterval(timer);
+
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.error || `Server error (${res.status})`);
+        }
+
+        const data = await res.json();
+        alert(`✅ Scraping selesai dalam ${seconds} detik! Berhasil mendapatkan ${data.leads?.length || 0} leads.`);
+        document.getElementById('scrapeModal').classList.add('hidden');
+        document.getElementById('scrapeModal').classList.remove('flex');
+        await loadFiles();
+      } catch (err) {
+        clearInterval(timer);
+        alert('❌ Error scraping: ' + err.message);
+      } finally {
+        btn.textContent = 'Mulai Cari Leads';
+        btn.disabled = false;
+      }
+    });
+
+    loadFiles();
+  </script>
+</body>
+</html>
