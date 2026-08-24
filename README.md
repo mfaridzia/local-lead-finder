@@ -1,86 +1,108 @@
-# 🎯 Local Lead Finder
+# 🎯 Local Lead Finder & AI Outreach
 
-Tool otomatis pencari lead bisnis lokal dari **Google Maps** dan **Search Engine** berbasis **Crawlee** + **Playwright** (100% gratis, aman dari bot detection dengan rotasi fingerprint & human-like delay).
-
----
-
-## 🚀 Fitur Utama
-
-- **Google Maps Scraper:** Mengambil nama bisnis, rating, jumlah ulasan, alamat, nomor telepon, dan mendeteksi apakah bisnis sudah memiliki website atau belum.
-- **Normalisasi WhatsApp Indonesia:** Otomatis mengubah format nomor seluler (`08...` / `+62...`) menjadi `628...` dan langsung membuat link chat WhatsApp dengan template pesan (*icebreaker*).
-- **Anti-Bot & Stealth:** Menggunakan Crawlee fingerprint spoofing, SSL handling, dan jeda scrolling acak (human jitter) agar tidak terblokir / bebas captcha.
-- **Auto Export:** Menyimpan hasil pencarian ke file `.json` dan spreadsheet `.csv` di folder `output/`.
+An automated lead discovery and qualification engine for local businesses using **Crawlee** + **Playwright** and **DeepSeek AI** (with Zod schema validation). Includes a modern, fully-responsive Web Dashboard with 1-click WhatsApp outreach.
 
 ---
 
-## 📦 Instalasi
+## 🚀 Key Features
 
-Dependencies sudah terpasang. Jika ingin install ulang:
+- **Google Maps Scraper:** Extracts business names, categories, ratings, review counts, addresses, phone numbers, and detects whether the business has an active website or not.
+- **Indonesian Phone & WhatsApp Normalizer:** Automatically formats local cellular numbers (`08...` / `+62...`) to international standard (`628...`) and generates direct WhatsApp click-to-chat links with personalized icebreaker messages.
+- **DeepSeek AI Lead Qualification:** Analyzes prospects, computes a lead readiness score (0–100), identifies digital gaps (e.g., *"1,000+ reviews but no online catalog"*), and generates polite, non-spammy WhatsApp outreach messages.
+- **Anti-Bot & Stealth Engine:** Built on top of Crawlee fingerprint spoofing, SSL handling, and randomized human scrolling jitter to avoid CAPTCHAs and bot detection.
+- **Interactive Responsive Dashboard:** Dual-view UI (rich data table for desktop and responsive cards for mobile/tablet) with live filtering, instant search, and web-based scraping trigger.
+- **Auto Export:** Automatically exports all scraped and qualified leads into `.json` and spreadsheet-ready `.csv` files inside the `output/` directory.
+
+---
+
+## 📦 Installation
 
 ```bash
+# Install dependencies
 pnpm install
+
+# Install Playwright Chromium browser
 npx playwright install chromium
 ```
 
 ---
 
-## 💻 Cara Menjalankan
+## ⚙️ Configuration (DeepSeek AI)
 
-### 1. Buka Web Dashboard Interaktif (Rekomendasi)
-```bash
-pnpm dashboard
-```
-Buka browser di **`http://localhost:3000`** untuk:
-- Melihat tabel leads dengan filter (Score AI > 80, Tanpa Website, WhatsApp Ready).
-- Melihat ringkasan analisis gap & peluang bisnis oleh AI.
-- Klik **"Outreach"** untuk edit & kirim template pesan personal langsung ke WhatsApp prospek (1-klik).
-- Menjalankan scraping baru langsung dari antarmuka web.
-
----
-
-### 2. Jalankan Scraping via Terminal / CLI
-```bash
-# Contoh: Cari bakery di Mataram
-pnpm scrape:gmaps -k "bakery" -l "Mataram" -m 15
-
-# Contoh niche lain:
-pnpm scrape:gmaps -k "katering" -l "Mataram" -m 20
-pnpm scrape:gmaps -k "barbershop" -l "Denpasar" -m 10
-pnpm scrape:gmaps -k "laundry" -l "Surabaya" -m 25
-
-# Mode Non-Headless (untuk melihat browser bekerja secara visual):
-pnpm scrape:gmaps -k "toko kue" -l "Mataram" -m 10 --no-headless
-```
-
----
-
-## 🤖 Konfigurasi DeepSeek AI
-
-1. Salin `.env.example` menjadi `.env`:
+1. Copy the example environment file:
    ```bash
    cp .env.example .env
    ```
-2. Masukkan API key DeepSeek Anda di `.env`:
+2. Add your DeepSeek API key in `.env`:
    ```env
    DEEPSEEK_API_KEY=sk-...
+   PORT=3000
    ```
-*(Catatan: Jika API key belum diisi, sistem otomatis menggunakan smart fallback heuristic scoring sehingga dashboard tetap bisa berjalan normal).*
+> **Note:** If `DEEPSEEK_API_KEY` is not provided, the application automatically uses smart heuristic scoring as a fallback so the dashboard and scraper continue to work smoothly.
 
 ---
 
-## 📊 Format Output
+## 💻 Usage
 
-Setiap kali dijalankan, hasil otomatis tersimpan di folder `output/`:
-- `output/gmaps-<keyword>-<lokasi>-<timestamp>.csv` (Bisa langsung dibuka di Excel / Google Sheets)
-- `output/gmaps-<keyword>-<lokasi>-<timestamp>.json`
+### 1. Launch the Interactive Web Dashboard (Recommended)
+```bash
+pnpm dashboard
+```
+Open your browser at **`http://localhost:3000`** to:
+- Browse leads with one-click filters (*"❌ No Website"*, *"💬 Has WhatsApp"*, *"🔥 Score > 80"*).
+- View AI-generated gap analyses and value proposition recommendations.
+- Click **"Outreach"** to preview, edit, and launch 1-click WhatsApp conversations with prospects.
+- Trigger new scraping tasks directly from the UI.
 
-Kolom CSV mencakup:
-1. `Nama Bisnis`
-2. `Kategori`
-3. `No Telepon`
+---
+
+### 2. Run Scraping via Terminal (CLI)
+```bash
+# Example: Find bakeries in Mataram (max 15 leads)
+pnpm scrape:gmaps -k "bakery" -l "Mataram" -m 15
+
+# Other niche examples:
+pnpm scrape:gmaps -k "catering" -l "Mataram" -m 20
+pnpm scrape:gmaps -k "barbershop" -l "Denpasar" -m 10
+pnpm scrape:gmaps -k "laundry" -l "Surabaya" -m 25
+
+# Visual mode (opens browser window):
+pnpm scrape:gmaps -k "bakery" -l "Mataram" -m 10 --no-headless
+```
+
+---
+
+## 📊 Output Format
+
+Scraped leads are automatically saved in the `output/` folder:
+- `output/gmaps-<keyword>-<location>-<timestamp>.csv` (Ready for Excel / Google Sheets)
+- `output/gmaps-<keyword>-<location>-<timestamp>.json`
+
+### CSV Columns:
+1. `Business Name`
+2. `Category`
+3. `Phone Number`
 4. `WhatsApp`
-5. `Punya Website?` (*Ya / TIDAK*)
-6. `Rating` & `Jumlah Review`
-7. `Alamat`
-8. `Link WA Direct` (*Tinggal klik untuk langsung chat prospek*)
-9. `Link Google Maps`
+5. `Has Website?` (*Yes / NO*)
+6. `Rating` & `Review Count`
+7. `AI Lead Score`
+8. `Address`
+9. `Direct WhatsApp Link`
+10. `Source Link`
+
+---
+
+## 🛠️ Tech Stack
+
+- **Runtime:** Node.js (ESM) + TypeScript
+- **Web Scraping:** Crawlee + Playwright
+- **AI Engine:** DeepSeek Chat API (`deepseek-chat`)
+- **Schema Validation:** Zod
+- **Backend Server:** Hono + `@hono/node-server`
+- **Frontend Dashboard:** HTML5 + Tailwind CSS + Vanilla JS
+
+---
+
+## 📄 License
+
+ISC License
