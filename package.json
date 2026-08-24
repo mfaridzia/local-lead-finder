@@ -1,5 +1,5 @@
 {
-  "name": "lead-finder",
+  "name": "local-lead-finder",
   "version": "1.0.0",
   "description": "",
   "main": "dist/cli.js",
